@@ -1,13 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect} from 'react';
 import './App.css';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import Routes from './routes';
+import GlobalStyle from './styles/globals';
 
-function App() {
+
+const App: React.FC = () => {
+  useEffect(() => {
+    if (window.navigator.onLine === false) {
+      toast.error(
+        'Você parece estar sem internet. Verifique sua conexão para continuar.',
+      );
+    }
+  }, []);
+
   return (
-    <div className='App'>
-      <h1>Hello</h1>
-    </div>
+      <Router>
+        <GlobalStyle />
+        <Routes />
+      </Router>
   );
-}
+};
 
 export default App;
