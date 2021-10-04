@@ -1,62 +1,49 @@
 import React from 'react';
-// import { Container } from './style';
-import Todos from '../models/todos'
+import Todos from '../models/todos';
+import { BiTrash, BiEditAlt } from 'react-icons/bi';
+import styled from 'styled-components';
+import { Card } from '@material-ui/core';
 
+const TodoItemList = styled(Card)`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 0 0.5rem 0  0.5rem ;
+  margin: 0.5rem 0 ;
+  justify-content: space-between;
+  font-size: var(--font-large);
+  line-height: 2.5rem;
+  border-radius: 10px;
+`;
+
+const TrashItem = styled.div`
+  height: 2.3rem;
+  :hover {
+    cursor: pointer;
+  }
+`;
 interface TodosProps {
   todos: Todos;
+  handleDelete: (e: React.FormEvent, todoId: number) => void;
+  handleEdit: (e: React.FormEvent, todoId: number) => void;
 }
 
-const TodoItem: React.FC<TodosProps> = ({todos}) => {
+const TodoItem: React.FC<TodosProps> = ({ todos, handleDelete, handleEdit }) => {
   const { userId, id, title, completed } = todos;
 
   return (
-      <div className='list-group-item d-flex justify-content-between my-2' >
-        <h6
-        //   className={`mt-1 mb-0 align-middle ${
-        //     completed === true ? 'completed-task' : ''
-        //   } ${deleted === true ? 'deleted-task' : ''} `}
-        >
-          {title}
-        </h6>
-        {/* <h6
-        //   className={`mt-1 mb-0 align-middle ${
-        //     completed === true ? 'completed-task' : ''
-        //   } ${deleted === true ? 'deleted-task' : ''} `}
-        >
-          {completed.toString()}
-        </h6> */}
-        <div className='todo-icon'>
-          {/* <span
-            // className={`mt-1 mb-0 align-middle ${
-            //   completed === true ? 'completed-task' : ''
-            // } ${deleted === true ? 'deleted-task' : ''}`}
-          >
-            {completed}
-          </span> */}
-          {/* <span
-            className={`mx-2 ${
-              completed === true ? 'text-success' : 'text-secondary'
-            } ${deleted === true ? 'deleted-task' : ''}`}
-            onClick={doneTask}
-          >
-            <i
-              className={`${
-                completed === true ? ' fas fa-check ' : 'fas fa-check'
-              } ${deleted === true ? 'deleted-task' : ''}`}
-            />
-          </span> */}
-          <span className='mx-2 text-warning' 
+    <TodoItemList key={id}>
+      <h6>{title}</h6>
+      <TrashItem
+        className=""
         //   onClick={handleEdit}
-          >
-            <i className='fas fa-pen' />
-          </span>
-          <span className='mx-2 text-danger' 
-        //   onClick={handleDelete}
-          >
-            <i className='fas fa-trash' />
-          </span>
-        </div>
-      </div>
+      >
+        <BiTrash onClick={(e) => handleDelete(e, id)} className="trash-icon" />
+        <BiEditAlt onClick={(e) => handleEdit(e, id)} className="trash-icon" />
+
+        {/* <i className="" /> */}
+      </TrashItem>
+    </TodoItemList>
   );
 };
 

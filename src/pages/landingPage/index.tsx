@@ -1,6 +1,4 @@
-/* eslint-disable react/jsx-no-undef */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable no-sequences */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -10,6 +8,7 @@ import UsersInterface from '../../models/users';
 
 // import { getInfoByType } from 'services/info';
 // import Info from 'services/info/models/info-interface';
+import IUsers from '../../models/users';
 
 import { getAllUsers } from '../../services/users';
 import {
@@ -21,7 +20,7 @@ import {
 } from './style';
 
 const landingPage: React.FC = () => {
-  const [users, setusers] = useState<any[]>();
+  const [users, setusers] = useState<IUsers[]>();
   const [showUsers, setShowUsers] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UsersInterface>();
 
@@ -39,6 +38,7 @@ const landingPage: React.FC = () => {
   const getLadingpageContent = async () => {
     try {
       const data = await getAllUsers();
+      console.log(data)
       setusers(data);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
