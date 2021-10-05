@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import getErrorMessage from '../../helpers/errorMessages';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import UsersInterface from '../../models/users';
+import LoadingBg from '../../components/Loading';
 
-// import { getInfoByType } from 'services/info';
-// import Info from 'services/info/models/info-interface';
 import IUsers from '../../models/users';
 
 import { getAllUsers } from '../../services/users';
@@ -24,23 +23,21 @@ const landingPage: React.FC = () => {
   const [users, setusers] = useState<IUsers[]>();
   const [showUsers, setShowUsers] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UsersInterface>();
+  const [loading, setLoading] = useState(false);
 
   const history = useHistory();
 
   const DropdownUsers = () => setShowUsers(!showUsers);
 
-  const setUser = (user: any): void => {
+  const setUser = (user: IUsers): void => {
     setSelectedUser(user);
   };
-
-  // if (loading) return <LoadingBg />;
-  // if (error) return <Error type="LoadFail" />;
 
   const getLadingpageContent = async () => {
     try {
       const data = await getAllUsers();
-      console.log(data);
       setusers(data);
+      setLoading(true);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       toast.error(errorMessage);
@@ -64,49 +61,53 @@ const landingPage: React.FC = () => {
 
   return (
     <Container>
-      <Features>
-        <div>
-          <div className="title">
-            <h2>
-              <strong>All In One - Project</strong> para aprofundar o
-              conhecimento!
-            </h2>
-          </div>
-          {users && (
-            <>
-              <ButtonContainer>
-                <ButtonWrapper onClick={DropdownUsers}>
-                  {!selectedUser
-                    ? 'Selecione o seu usuário:'
-                    : selectedUser.name}
-                </ButtonWrapper>
-              </ButtonContainer>
-              {showUsers &&
-                users.map((user) => {
-                  return (
-                    <label key={user.id}>
-                      <MenuItemWrapper>
-                        <input
-                          type="radio"
-                          onClick={() => {
-                            setUser(user), setShowUsers(!showUsers);
-                          }}
-                          value={user.name}
-                        />
-                        {user.name}
-                      </MenuItemWrapper>
-                    </label>
-                  );
-                })}
-            </>
-          )}
-          <div className="container-btn">
-            {selectedUser && (
-              <LoginButton onClick={() => submitUser()}>Entrar</LoginButton>
+      {loading ? (
+        <Features>
+          <div>
+            <div className="title">
+              <h2>
+                <strong>All In One - Project</strong> para aprofundar o
+                conhecimento!
+              </h2>
+            </div>
+            {users && (
+              <>
+                <ButtonContainer>
+                  <ButtonWrapper onClick={DropdownUsers}>
+                    {!selectedUser
+                      ? 'Selecione o seu usuário:'
+                      : selectedUser.name}
+                  </ButtonWrapper>
+                </ButtonContainer>
+                {showUsers &&
+                  users.map((user) => {
+                    return (
+                      <label key={user.id}>
+                        <MenuItemWrapper>
+                          <input
+                            type="radio"
+                            onClick={() => {
+                              setUser(user), setShowUsers(!showUsers);
+                            }}
+                            value={user.name}
+                          />
+                          {user.name}
+                        </MenuItemWrapper>
+                      </label>
+                    );
+                  })}
+              </>
             )}
+            <div className="container-btn">
+              {selectedUser && (
+                <LoginButton onClick={() => submitUser()}>Entrar</LoginButton>
+              )}
+            </div>
           </div>
-        </div>
-      </Features>
+        </Features>
+      ) : (
+        <LoadingBg />
+      )}
     </Container>
   );
 };

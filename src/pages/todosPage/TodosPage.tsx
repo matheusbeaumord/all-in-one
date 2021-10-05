@@ -9,15 +9,11 @@ import {
   ButtonContainer,
   TodosContainer,
 } from './style';
-import { getTodo } from '../../services/todos';
+import { getTodo, addTodo, updateTodo, deleteTodo } from '../../services/todos';
 import getErrorMessage from '../../helpers/errorMessages';
 import TodoItem from '../../components/TodosCard';
 import UsersInterface from '../../models/users';
 import LoadingBg from '../../components/Loading';
-
-// interface TodosResult {
-//   allTodos: ITodos;
-// }
 
 const Todos: React.FC = () => {
   const [todos, setTodos] = useState<ITodos[]>([]);
@@ -27,7 +23,7 @@ const Todos: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<UsersInterface>();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!todo) {
@@ -40,8 +36,8 @@ const Todos: React.FC = () => {
     }
 
     const verifyTodo = todos?.map((item) => item.id);
-    const biggestId = Math.max(...verifyTodo)
-    
+    const biggestId = Math.max(...verifyTodo);
+
     const newId = biggestId + 1;
     const result = {
       userId: selectedUser?.id,
@@ -50,16 +46,36 @@ const Todos: React.FC = () => {
       completed: false,
     };
 
+    // requisição de tipo post sendo realizada para inserir uma tarefa a lista.
+    try {
+      const addNewtask = await addTodo(result);
+      console.log('addNewtask', addNewtask);
+    } catch (err) {
+      console.log(err);
+    }
+
     const finalResult = [...todos, result];
     setTodos(finalResult);
     setTodo('');
   };
 
-  const updateTask = (e: React.FormEvent) => {
+  const updateTask = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
     if (verifyTodo >= 0) {
+      const result = {
+        title: todo,
+      };
+
+      // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
+      try {
+        const updateTask = todoId && (await updateTodo(todoId, result));
+        console.log('updateTask', updateTask);
+      } catch (err) {
+        console.log(err);
+      }
+
       todos[verifyTodo].title = todo;
       setTodos((todos) => [...todos]);
       setTodo('');
@@ -79,6 +95,13 @@ const Todos: React.FC = () => {
   };
 
   const handleDelete = async (e: React.FormEvent, todoId: number) => {
+    // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
+    try {
+      await deleteTodo(todoId);
+    } catch (err) {
+      console.log(err);
+    }
+
     e.stopPropagation();
     setTodos(todos?.filter(({ id }) => id !== todoId));
   };
@@ -93,8 +116,6 @@ const Todos: React.FC = () => {
     e.preventDefault();
     const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
     const { completed } = todos[verifyTodo];
-    console.log(todos);
-    
 
     if (verifyTodo >= 0) {
       todos[verifyTodo].completed = !completed;
@@ -127,7 +148,9 @@ const Todos: React.FC = () => {
     <Section>
       {loading ? (
         <>
-          <Title><strong>Todos</strong></Title>
+          <Title>
+            <strong>Todos</strong>
+          </Title>
           <div>
             <form onSubmit={edit === false ? handleSubmit : updateTask}>
               <InputComponent
