@@ -7,6 +7,7 @@ import {
   InputComponent,
   ButtonContent,
   ButtonContainer,
+  TodosContainer,
 } from './style';
 import { getTodo } from '../../services/todos';
 import getErrorMessage from '../../helpers/errorMessages';
@@ -38,7 +39,10 @@ const Todos: React.FC = () => {
       return;
     }
 
-    const newId = todos.length + 1;
+    const verifyTodo = todos?.map((item) => item.id);
+    const biggestId = Math.max(...verifyTodo)
+    
+    const newId = biggestId + 1;
     const result = {
       userId: selectedUser?.id,
       id: newId,
@@ -48,7 +52,6 @@ const Todos: React.FC = () => {
 
     const finalResult = [...todos, result];
     setTodos(finalResult);
-    // todos.push(result);
     setTodo('');
   };
 
@@ -56,12 +59,12 @@ const Todos: React.FC = () => {
     e.preventDefault();
 
     const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
-    console.log(verifyTodo);
     if (verifyTodo >= 0) {
       todos[verifyTodo].title = todo;
       setTodos((todos) => [...todos]);
       setTodo('');
     }
+    setEdit(false);
   };
 
   const handleChange = (
@@ -84,6 +87,21 @@ const Todos: React.FC = () => {
     e.preventDefault();
     handleChange(e, todoId);
     setEdit(true);
+  };
+
+  const handleCompleted = async (e: React.FormEvent, todoId: number) => {
+    e.preventDefault();
+    const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
+    const { completed } = todos[verifyTodo];
+    console.log(todos);
+    
+
+    if (verifyTodo >= 0) {
+      todos[verifyTodo].completed = !completed;
+      setTodos((todos) => [...todos]);
+    } else {
+      console.log('errorrr');
+    }
   };
 
   useEffect(() => {
@@ -109,7 +127,7 @@ const Todos: React.FC = () => {
     <Section>
       {loading ? (
         <>
-          <Title>Todos</Title>
+          <Title><strong>Todos</strong></Title>
           <div>
             <form onSubmit={edit === false ? handleSubmit : updateTask}>
               <InputComponent
@@ -131,16 +149,17 @@ const Todos: React.FC = () => {
               </ButtonContainer>
             </form>
           </div>
-          <div>
+          <TodosContainer>
             {todos &&
               todos.map((todos) => (
                 <TodoItem
                   todos={todos}
                   handleDelete={handleDelete}
                   handleEdit={handleEdit}
+                  handleCompleted={handleCompleted}
                 />
               ))}
-          </div>
+          </TodosContainer>
         </>
       ) : (
         <LoadingBg />

@@ -6,7 +6,7 @@ export const Container = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  background-color: #f5f9fc;
+  background-color: var(--white-glass);
   background-size: contain;
   background-repeat: no-repeat;
 
@@ -26,7 +26,7 @@ export const Features = styled.section`
   align-items: center;
 
   padding: 100px 40px;
-  background-color: #f5f9fc;
+  background-color: var(--white-glass);
 
   .title {
     display: flex;
@@ -86,12 +86,6 @@ export const Features = styled.section`
       text-align: center;
       margin: 30px 0;
     }
-
-    .container-btn {
-      display: flex;
-      max-width: inherit;
-      width: 100%;
-    }
   }
 `;
 
@@ -102,9 +96,11 @@ export const LoginButton = styled.button`
   outline: none;
   border: none;
   cursor: pointer;
+  margin-top: 20px;
   padding: 8px;
-  min-width: 40px;
-  min-height: 40px;
+  width: 100%;
+  min-width: 80px;
+  min-height: 50px;
   transition: all 0.5s;
 
   :hover {
@@ -119,12 +115,22 @@ export interface IButtonProps extends ButtonProps {
   round?: number;
 }
 
+
+export const ButtonContainer = styled.div`
+align-items: center;
+button {
+width: 100%;
+margin-top: 5rem;
+background-color: var(--grey-medium);
+}
+`
+
 export const ButtonWrapper = styled(MaterialButton)`
   ${({ round }: IButtonProps) => css`
         height: 50px;
     
       .MuiButton-label {
-        border-bottom: 1px solid ${'white'};
+        border-bottom: 1px solid var(--grey-medium);
         line-height: 1;
         font-weight: bold;
         font-size: 1.0rem;

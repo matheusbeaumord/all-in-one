@@ -2,47 +2,71 @@ import React from 'react';
 import Todos from '../models/todos';
 import { BiTrash, BiEditAlt } from 'react-icons/bi';
 import styled from 'styled-components';
-import { Card } from '@material-ui/core';
+import { Card, Checkbox } from '@material-ui/core';
 
 const TodoItemList = styled(Card)`
-  width: 100%;
+  width: 50rem;
   display: flex;
   flex-direction: row;
-  padding: 0 0.5rem 0  0.5rem ;
-  margin: 0.5rem 0 ;
+  padding: 0 0.5rem 0 0.5rem;
+  margin: 0.5rem 0;
   justify-content: space-between;
   font-size: var(--font-large);
   line-height: 2.5rem;
   border-radius: 10px;
 `;
 
-const TrashItem = styled.div`
+const ButtonContainer = styled.div`
+  display: flex;
+  width: 8rem;
+  justify-content: space-between;
+  padding: 0.5rem 0 0.5rem;
   height: 2.3rem;
+  div{
   :hover {
     cursor: pointer;
+  }
   }
 `;
 interface TodosProps {
   todos: Todos;
   handleDelete: (e: React.FormEvent, todoId: number) => void;
   handleEdit: (e: React.FormEvent, todoId: number) => void;
+  handleCompleted: (e: React.FormEvent, todoId: number) => void;
 }
 
-const TodoItem: React.FC<TodosProps> = ({ todos, handleDelete, handleEdit }) => {
+const TodoItem: React.FC<TodosProps> = ({
+  todos,
+  handleDelete,
+  handleEdit,
+  handleCompleted,
+}) => {
   const { userId, id, title, completed } = todos;
 
   return (
     <TodoItemList key={id}>
       <h6>{title}</h6>
-      <TrashItem
-        className=""
-        //   onClick={handleEdit}
-      >
-        <BiTrash onClick={(e) => handleDelete(e, id)} className="trash-icon" />
-        <BiEditAlt onClick={(e) => handleEdit(e, id)} className="trash-icon" />
-
-        {/* <i className="" /> */}
-      </TrashItem>
+      <ButtonContainer>
+        <div>
+          <BiTrash
+            onClick={(e) => handleDelete(e, id)}
+            className="trash-icon"
+          />
+        </div>
+        <div>
+          <BiEditAlt
+            onClick={(e) => handleEdit(e, id)}
+            className="trash-icon"
+          />
+        </div>
+        <div>
+          <Checkbox
+            checked={completed}
+            color="primary"
+            onClick={(e) => handleCompleted(e, id)}
+          />
+        </div>
+      </ButtonContainer>
     </TodoItemList>
   );
 };

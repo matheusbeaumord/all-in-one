@@ -13,11 +13,16 @@ export const Section = styled.section`
 `;
 
 export const Title = styled.h2`
-  font-size: 40px;
-  line-height: 40px;
-  color: var(--blue-water);
-  font-weight: 800;
-  text-transform: uppercase;
+  /* font-size: var(--font-bigger); */
+  font-size: 46px;
+  font-weight: 300;
+  strong {
+      font-weight: 700;
+    }
+  /* line-height: 40px; */
+  /* color: var(--blue-medium); */
+  /* font-weight: 800; */
+  /* text-transform: uppercase; */
 `;
 
 export const Description = styled.h3`
@@ -42,6 +47,9 @@ export const ButtonContainer = styled.div`
   padding: 2rem 0 2rem 0;
 `;
 
-export const ButtonContent = styled(Button)`
-  
+export const ButtonContent = styled(Button)``;
+
+export const TodosContainer = styled.div`
+  display: flex;
+  flex-direction: column-reverse;
 `;

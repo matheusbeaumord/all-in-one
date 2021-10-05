@@ -17,6 +17,7 @@ import {
   LoginButton,
   ButtonWrapper,
   MenuItemWrapper,
+  ButtonContainer,
 } from './style';
 
 const landingPage: React.FC = () => {
@@ -38,7 +39,7 @@ const landingPage: React.FC = () => {
   const getLadingpageContent = async () => {
     try {
       const data = await getAllUsers();
-      console.log(data)
+      console.log(data);
       setusers(data);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
@@ -73,9 +74,13 @@ const landingPage: React.FC = () => {
           </div>
           {users && (
             <>
-              <ButtonWrapper onClick={DropdownUsers}>
-                {!selectedUser ? 'Selecione o seu usuário:' : selectedUser.name}
-              </ButtonWrapper>
+              <ButtonContainer>
+                <ButtonWrapper onClick={DropdownUsers}>
+                  {!selectedUser
+                    ? 'Selecione o seu usuário:'
+                    : selectedUser.name}
+                </ButtonWrapper>
+              </ButtonContainer>
               {showUsers &&
                 users.map((user) => {
                   return (
