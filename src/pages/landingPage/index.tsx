@@ -51,7 +51,7 @@ const landingPage: React.FC = () => {
         name: selectedUser.name,
       };
       localStorage.setItem('all-in-one-user', JSON.stringify(userLocalStorage));
-      history.push(`/todos`);
+      history.push(`/home`);
     }
   };
 

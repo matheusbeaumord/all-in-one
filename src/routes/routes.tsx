@@ -1,7 +1,8 @@
-import { TODOS, LADINGPAGE } from './Constants';
+import { TODOS, LADINGPAGE, HOMEPAGE } from './Constants';
 
 import LandingPage from '../pages/landingPage';
 import Todos from '../pages/todosPage/TodosPage';
+import HomePage from '../pages/home/HomePage';
 
 export interface IRoutes {
   path: string;
@@ -24,6 +25,13 @@ const routes: IRoutes[] = [
     path: LADINGPAGE,
     name: 'landing',
     component: LandingPage,
+    exact: true,
+  },
+
+  {
+    path: HOMEPAGE,
+    name: 'home',
+    component: HomePage,
     exact: true,
   },
 ];

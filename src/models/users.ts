@@ -1,6 +1,6 @@
-interface Users {
+interface IUsers {
   id: number;
   name: string;
 }
 
-export default Users;
+export default IUsers;

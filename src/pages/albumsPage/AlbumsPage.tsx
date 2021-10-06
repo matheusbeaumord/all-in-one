@@ -1,24 +1,25 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import ITodos from '../../models/todos';
+import IAlbums from '../../models/albums';
 import { toast } from 'react-toastify';
 import {
   Section,
-  Title,
   InputComponent,
   ButtonContent,
   ButtonContainer,
   TodosContainer,
 } from './style';
-import { getTodo, addTodo, updateTodo, deleteTodo } from '../../services/todos';
+import { getAlbums, addAlbums, updateAlbums, deleteAlbums  } from '../../services/albums';
+
+
 import getErrorMessage from '../../helpers/errorMessages';
-import TodoItem from '../../components/TodosCard';
+import AlbumCard from '../../components/AlbumsCard';
 import UsersInterface from '../../models/users';
 import LoadingBg from '../../components/Loading';
 
-const Todos: React.FC = () => {
-  const [todos, setTodos] = useState<ITodos[]>([]);
-  const [todo, setTodo] = useState<string>('');
-  const [todoId, setTodoId] = useState<number>();
+const Albums: React.FC = () => {
+  const [albums, setAlbums] = useState<IAlbums[]>([]);
+  const [album, setAlbum] = useState<string>('');
+  const [id, setId] = useState<number>();
   const [edit, setEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UsersInterface>();
   const [loading, setLoading] = useState(false);
@@ -26,59 +27,58 @@ const Todos: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!todo) {
+    if (!album) {
       toast.error('please enter something');
       return;
     }
-    if (todos?.some(({ title }) => title === todo)) {
-      toast.error(`Task: ${todo} already exists`);
+    if (albums?.some(({ title }) => title === album)) {
+      toast.error(`album: ${album} already exists`);
       return;
     }
 
-    const verifyTodo = todos?.map((item) => item.id);
-    const biggestId = Math.max(...verifyTodo);
+    const verifyAlbum = albums?.map((item) => item.id);
+    const biggestId = Math.max(...verifyAlbum);
 
     const newId = biggestId + 1;
     const result = {
       userId: selectedUser?.id,
       id: newId,
-      title: todo,
-      completed: false,
+      title: album,
     };
 
-    // requisição de tipo post sendo realizada para inserir uma tarefa a lista.
+    // requisição de tipo album sendo realizada para inserir uma tarefa a lista.
     try {
-      const addNewtask = await addTodo(result);
-      console.log('addNewtask', addNewtask);
+      const addNewAlbum = await addAlbums(result);
+      console.log('addNewAlbum', addNewAlbum);
     } catch (err) {
       console.log(err);
     }
 
-    const finalResult = [...todos, result];
-    setTodos(finalResult);
-    setTodo('');
+    const finalResult = [...albums, result];
+    setAlbums(finalResult);
+    setAlbum('');
   };
 
   const updateTask = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
-    if (verifyTodo >= 0) {
+    const verifyAlbum = albums?.findIndex((teste) => teste.id === id);
+    if (verifyAlbum >= 0) {
       const result = {
-        title: todo,
+        title: album,
       };
 
       // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
       try {
-        const updateTask = todoId && (await updateTodo(todoId, result));
-        console.log('updateTask', updateTask);
+        const updateAlbum = id && (await updateAlbums(id, result));
+        console.log('updateAlbum', updateAlbum);
       } catch (err) {
         console.log(err);
       }
 
-      todos[verifyTodo].title = todo;
-      setTodos((todos) => [...todos]);
-      setTodo('');
+      albums[verifyAlbum].title = album;
+      setAlbums((albums) => [...albums]);
+      setAlbum('');
     }
     setEdit(false);
   };
@@ -88,41 +88,28 @@ const Todos: React.FC = () => {
     tudoid?: number
   ) => {
     tudoid
-      ? todos?.find(
-          (e) => e.id === tudoid && (setTodo(e.title), setTodoId(tudoid))
+      ? albums?.find(
+          (e) => e.id === tudoid && (setAlbum(e.title), setId(tudoid))
         )
-      : setTodo(target.value);
+      : setAlbum(target.value);
   };
 
-  const handleDelete = async (e: React.FormEvent, todoId: number) => {
+  const handleDelete = async (e: React.FormEvent, postId: number) => {
     // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
+    e.stopPropagation();
     try {
-      await deleteTodo(todoId);
+      await deleteAlbums(postId);
     } catch (err) {
       console.log(err);
     }
 
-    e.stopPropagation();
-    setTodos(todos?.filter(({ id }) => id !== todoId));
+    setAlbums(albums?.filter(({ id }) => id !== postId));
   };
 
-  const handleEdit = async (e: any, todoId: number) => {
+  const handleEdit = async (e: any, id: number) => {
     e.preventDefault();
-    handleChange(e, todoId);
+    handleChange(e, id);
     setEdit(true);
-  };
-
-  const handleCompleted = async (e: React.FormEvent, todoId: number) => {
-    e.preventDefault();
-    const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
-    const { completed } = todos[verifyTodo];
-
-    if (verifyTodo >= 0) {
-      todos[verifyTodo].completed = !completed;
-      setTodos((todos) => [...todos]);
-    } else {
-      console.log('errorrr');
-    }
   };
 
   useEffect(() => {
@@ -131,8 +118,8 @@ const Todos: React.FC = () => {
       const getTodosContent = async () => {
         try {
           setSelectedUser(JSON.parse(user));
-          const todosData = await getTodo(selectedUser?.id);
-          setTodos(todosData);
+          const todosData = await getAlbums(selectedUser?.id);
+          setAlbums(todosData);
           setLoading(true);
         } catch (err) {
           const errorMessage = getErrorMessage(err);
@@ -148,15 +135,12 @@ const Todos: React.FC = () => {
     <Section>
       {loading ? (
         <>
-          {/* <Title>
-            <strong>Todos</strong>
-          </Title> */}
           <div>
             <form onSubmit={edit === false ? handleSubmit : updateTask}>
               <InputComponent
                 type="text"
-                placeholder="New Todo"
-                value={todo}
+                placeholder="New album"
+                value={album}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
               />
               <ButtonContainer>
@@ -165,21 +149,19 @@ const Todos: React.FC = () => {
                   size="large"
                   variant="outlined"
                   type="submit"
-                  className={edit ? 'btn-success' : 'btn-info'}
                 >
-                  {edit ? 'Edit task' : 'Add new task'}
+                  {edit ? 'Edit album' : 'Add new album'}
                 </ButtonContent>
               </ButtonContainer>
             </form>
           </div>
           <TodosContainer>
-            {todos &&
-              todos.map((todos) => (
-                <TodoItem
-                  todos={todos}
+            {albums &&
+              albums.map((albums) => (
+                <AlbumCard
+                  albums={albums}
                   handleDelete={handleDelete}
                   handleEdit={handleEdit}
-                  handleCompleted={handleCompleted}
                 />
               ))}
           </TodosContainer>
@@ -191,4 +173,4 @@ const Todos: React.FC = () => {
   );
 };
 
-export default Todos;
+export default Albums;

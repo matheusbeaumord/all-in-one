@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button, Input } from '@material-ui/core';
+import { Button, Input, TextField} from '@material-ui/core';
 
 export const Section = styled.section`
   display: flex;
@@ -33,6 +33,11 @@ export const InputComponent = styled(Input)`
   padding: 2rem 0 2rem 0;
 `;
 
+export const TextFilef = styled(TextField)`
+width: 40rem;
+height: 10rem;
+`;
+
 export const ButtonContainer = styled.div`
   width: 100%;
   display: flex;
@@ -41,7 +46,8 @@ export const ButtonContainer = styled.div`
   padding: 2rem 0 2rem 0;
 `;
 
-export const ButtonContent = styled(Button)``;
+export const ButtonContent = styled(Button)`
+`;
 
 export const TodosContainer = styled.div`
   display: flex;

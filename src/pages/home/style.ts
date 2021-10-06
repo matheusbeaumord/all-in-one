@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Button, Input } from '@material-ui/core';
 
 export const Section = styled.section`
+  margin: 47px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -12,11 +13,16 @@ export const Section = styled.section`
 `;
 
 export const Title = styled.h2`
-  font-size: 26px;
+  /* font-size: var(--font-bigger); */
+  font-size: 46px;
   font-weight: 300;
   strong {
       font-weight: 700;
     }
+  /* line-height: 40px; */
+  /* color: var(--blue-medium); */
+  /* font-weight: 800; */
+  /* text-transform: uppercase; */
 `;
 
 export const Description = styled.h3`

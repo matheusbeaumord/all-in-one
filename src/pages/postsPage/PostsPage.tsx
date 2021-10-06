@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import ITodos from '../../models/todos';
+import IPosts from '../../models/posts';
 import { toast } from 'react-toastify';
 import {
   Section,
@@ -8,17 +8,26 @@ import {
   ButtonContent,
   ButtonContainer,
   TodosContainer,
+  TextFilef,
 } from './style';
-import { getTodo, addTodo, updateTodo, deleteTodo } from '../../services/todos';
+import {
+  getPosts,
+  addPost,
+  updatePost,
+  deletePost,
+} from '../../services/posts';
+
 import getErrorMessage from '../../helpers/errorMessages';
-import TodoItem from '../../components/TodosCard';
+import PostCard from '../../components/PostCard';
 import UsersInterface from '../../models/users';
 import LoadingBg from '../../components/Loading';
+import description from 'material-ui/svg-icons/action/description';
 
-const Todos: React.FC = () => {
-  const [todos, setTodos] = useState<ITodos[]>([]);
-  const [todo, setTodo] = useState<string>('');
-  const [todoId, setTodoId] = useState<number>();
+const Posts: React.FC = () => {
+  const [posts, setPosts] = useState<IPosts[]>([]);
+  const [post, setPost] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [id, setId] = useState<number>();
   const [edit, setEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UsersInterface>();
   const [loading, setLoading] = useState(false);
@@ -26,59 +35,64 @@ const Todos: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!todo) {
+    if (!post) {
       toast.error('please enter something');
       return;
     }
-    if (todos?.some(({ title }) => title === todo)) {
-      toast.error(`Task: ${todo} already exists`);
+    if (posts?.some(({ title }) => title === post)) {
+      toast.error(`Post: ${post} already exists`);
       return;
     }
 
-    const verifyTodo = todos?.map((item) => item.id);
-    const biggestId = Math.max(...verifyTodo);
+    const verifyPost = posts?.map((item) => item.id);
+    const biggestId = Math.max(...verifyPost);
 
     const newId = biggestId + 1;
     const result = {
       userId: selectedUser?.id,
       id: newId,
-      title: todo,
-      completed: false,
+      title: post,
+      body: description,
     };
 
     // requisição de tipo post sendo realizada para inserir uma tarefa a lista.
     try {
-      const addNewtask = await addTodo(result);
-      console.log('addNewtask', addNewtask);
+      const addNewPost = await addPost(result);
+      console.log('addNewPost', addNewPost);
     } catch (err) {
       console.log(err);
     }
 
-    const finalResult = [...todos, result];
-    setTodos(finalResult);
-    setTodo('');
+    const finalResult = [...posts, result];
+    setPosts(finalResult);
+    setPost('');
+    setDescription('');
   };
 
   const updateTask = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
-    if (verifyTodo >= 0) {
+    const verifyPost = posts?.findIndex((teste) => teste.id === id);
+    if (verifyPost >= 0) {
       const result = {
-        title: todo,
+        title: post,
+        body: description,
       };
 
       // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
       try {
-        const updateTask = todoId && (await updateTodo(todoId, result));
-        console.log('updateTask', updateTask);
+        const updatePosts = id && (await updatePost(id, result));
+        console.log('updatePosts', updatePosts);
       } catch (err) {
         console.log(err);
       }
 
-      todos[verifyTodo].title = todo;
-      setTodos((todos) => [...todos]);
-      setTodo('');
+      posts[verifyPost].title = post;
+      posts[verifyPost].body = description;
+
+      setPosts((posts) => [...posts]);
+      setPost('');
+      setDescription('');
     }
     setEdit(false);
   };
@@ -88,41 +102,38 @@ const Todos: React.FC = () => {
     tudoid?: number
   ) => {
     tudoid
-      ? todos?.find(
-          (e) => e.id === tudoid && (setTodo(e.title), setTodoId(tudoid))
-        )
-      : setTodo(target.value);
+      ? posts?.find((e) => e.id === tudoid && (setPost(e.title), setId(tudoid)))
+      : setPost(target.value);
   };
 
-  const handleDelete = async (e: React.FormEvent, todoId: number) => {
+  const handleChangeDescription = (
+    { target }: React.ChangeEvent<HTMLInputElement>,
+    tudoid?: number
+  ) => {
+    tudoid
+      ? posts?.find(
+          (e) => e.id === tudoid && (setDescription(e.body), setId(tudoid))
+        )
+      : setDescription(target.value);
+  };
+
+  const handleDelete = async (e: React.FormEvent, postId: number) => {
     // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
+    e.stopPropagation();
     try {
-      await deleteTodo(todoId);
+      await deletePost(postId);
     } catch (err) {
       console.log(err);
     }
 
-    e.stopPropagation();
-    setTodos(todos?.filter(({ id }) => id !== todoId));
+    setPosts(posts?.filter(({ id }) => id !== postId));
   };
 
-  const handleEdit = async (e: any, todoId: number) => {
+  const handleEdit = async (e: any, id: number) => {
     e.preventDefault();
-    handleChange(e, todoId);
+    handleChange(e, id);
+    handleChangeDescription(e, id);
     setEdit(true);
-  };
-
-  const handleCompleted = async (e: React.FormEvent, todoId: number) => {
-    e.preventDefault();
-    const verifyTodo = todos?.findIndex((teste) => teste.id === todoId);
-    const { completed } = todos[verifyTodo];
-
-    if (verifyTodo >= 0) {
-      todos[verifyTodo].completed = !completed;
-      setTodos((todos) => [...todos]);
-    } else {
-      console.log('errorrr');
-    }
   };
 
   useEffect(() => {
@@ -131,8 +142,8 @@ const Todos: React.FC = () => {
       const getTodosContent = async () => {
         try {
           setSelectedUser(JSON.parse(user));
-          const todosData = await getTodo(selectedUser?.id);
-          setTodos(todosData);
+          const todosData = await getPosts(selectedUser?.id);
+          setPosts(todosData);
           setLoading(true);
         } catch (err) {
           const errorMessage = getErrorMessage(err);
@@ -149,16 +160,27 @@ const Todos: React.FC = () => {
       {loading ? (
         <>
           {/* <Title>
-            <strong>Todos</strong>
+            <strong>posts</strong>
           </Title> */}
           <div>
             <form onSubmit={edit === false ? handleSubmit : updateTask}>
               <InputComponent
                 type="text"
-                placeholder="New Todo"
-                value={todo}
+                placeholder="Title"
+                value={post}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
               />
+              <TextFilef
+                multiline
+                rows={4}
+                type="text"
+                placeholder="Description"
+                value={description}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleChangeDescription(e)
+                }
+              />
+
               <ButtonContainer>
                 <ButtonContent
                   color="primary"
@@ -167,19 +189,18 @@ const Todos: React.FC = () => {
                   type="submit"
                   className={edit ? 'btn-success' : 'btn-info'}
                 >
-                  {edit ? 'Edit task' : 'Add new task'}
+                  {edit ? 'Edit post' : 'Add new post'}
                 </ButtonContent>
               </ButtonContainer>
             </form>
           </div>
           <TodosContainer>
-            {todos &&
-              todos.map((todos) => (
-                <TodoItem
-                  todos={todos}
+            {posts &&
+              posts.map((posts) => (
+                <PostCard
+                  posts={posts}
                   handleDelete={handleDelete}
                   handleEdit={handleEdit}
-                  handleCompleted={handleCompleted}
                 />
               ))}
           </TodosContainer>
@@ -191,4 +212,4 @@ const Todos: React.FC = () => {
   );
 };
 
-export default Todos;
+export default Posts;
