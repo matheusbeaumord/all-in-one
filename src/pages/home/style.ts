@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button, Input } from '@material-ui/core';
+import { Button, Input, Tab, Box } from '@material-ui/core';
 
 export const Section = styled.section`
   margin: 47px 0;
@@ -11,6 +11,15 @@ export const Section = styled.section`
     flex-direction: column;
   }
 `;
+
+export const MenuBox = styled.div`
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+margin-top: 2rem;
+`
 
 export const Title = styled.h2`
   /* font-size: var(--font-bigger); */

@@ -1,14 +1,11 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { toast } from 'react-toastify';
-import { Section, Title } from './style';
+import React, { useState } from 'react';
+import { Section, Title, MenuBox } from './style';
 import LoadingBg from '../../components/Loading';
 import { TabList, TabContext, TabPanel } from '@material-ui/lab';
-import { Button, Input, Tab, Box } from '@material-ui/core';
-import TodosPage from '../todosPage/TodosPage'
-import PostsPage from '../postsPage/PostsPage'
-import AlbumsPage from '../albumsPage/AlbumsPage'
-
-
+import { Tab, Box } from '@material-ui/core';
+import TodosPage from '../todosPage/TodosPage';
+import PostsPage from '../postsPage/PostsPage';
+import AlbumsPage from '../albumsPage/AlbumsPage';
 
 const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -25,23 +22,23 @@ const HomePage: React.FC = () => {
           <Title>
             <strong>Home</strong>
           </Title>
-          <Box sx={{ width: '31rem', marginTop: '3rem' }}>
-            <TabContext value={value}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <TabList
-                  onChange={handleChange}
-                  aria-label="lab API tabs example"
-                >
-                  <Tab label="TO-DOs" value="1" />
-                  <Tab label="POSTAGENS" value="2" />
-                  <Tab label="ALBUNS" value="3" />
-                </TabList>
-              </Box>
-              <TabPanel value="1">{<TodosPage/>}</TabPanel>
-              <TabPanel value="2">{<PostsPage/>}</TabPanel>
-              <TabPanel value="3">{<AlbumsPage/>}</TabPanel>
-            </TabContext>
-          </Box>
+          <MenuBox>
+              <TabContext value={value}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  <TabList
+                    onChange={handleChange}
+                    aria-label="lab API tabs example"
+                  >
+                    <Tab label="TO-DOs" value="1" />
+                    <Tab label="POSTAGENS" value="2" />
+                    <Tab label="ALBUNS" value="3" />
+                  </TabList>
+                </Box>
+                <TabPanel value="1">{<TodosPage />}</TabPanel>
+                <TabPanel value="2">{<PostsPage />}</TabPanel>
+                <TabPanel value="3">{<AlbumsPage />}</TabPanel>
+              </TabContext>
+          </MenuBox>
         </>
       ) : (
         <LoadingBg />

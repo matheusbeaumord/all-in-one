@@ -48,15 +48,14 @@ const Todos: React.FC = () => {
 
     // requisição de tipo post sendo realizada para inserir uma tarefa a lista.
     try {
+      const finalResult = [...todos, result];
+      setTodos(finalResult);
+      setTodo('');
       const addNewtask = await addTodo(result);
       console.log('addNewtask', addNewtask);
     } catch (err) {
       console.log(err);
     }
-
-    const finalResult = [...todos, result];
-    setTodos(finalResult);
-    setTodo('');
   };
 
   const updateTask = async (e: React.FormEvent) => {
@@ -70,15 +69,14 @@ const Todos: React.FC = () => {
 
       // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
       try {
+        todos[verifyTodo].title = todo;
+        setTodos((todos) => [...todos]);
+        setTodo('');
         const updateTask = todoId && (await updateTodo(todoId, result));
         console.log('updateTask', updateTask);
       } catch (err) {
         console.log(err);
       }
-
-      todos[verifyTodo].title = todo;
-      setTodos((todos) => [...todos]);
-      setTodo('');
     }
     setEdit(false);
   };
@@ -96,14 +94,13 @@ const Todos: React.FC = () => {
 
   const handleDelete = async (e: React.FormEvent, todoId: number) => {
     // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
+    e.stopPropagation();
     try {
+      setTodos(todos?.filter(({ id }) => id !== todoId));
       await deleteTodo(todoId);
     } catch (err) {
       console.log(err);
     }
-
-    e.stopPropagation();
-    setTodos(todos?.filter(({ id }) => id !== todoId));
   };
 
   const handleEdit = async (e: any, todoId: number) => {
@@ -131,9 +128,10 @@ const Todos: React.FC = () => {
       const getTodosContent = async () => {
         try {
           setSelectedUser(JSON.parse(user));
-          const todosData = await getTodo(selectedUser?.id);
-          setTodos(todosData);
-          setLoading(true);
+          await getTodo(selectedUser?.id).then((todos) => {
+            setTodos(todos);
+            setLoading(true);
+          });
         } catch (err) {
           const errorMessage = getErrorMessage(err);
           toast.error(errorMessage);

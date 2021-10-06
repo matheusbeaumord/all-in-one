@@ -21,7 +21,6 @@ import getErrorMessage from '../../helpers/errorMessages';
 import PostCard from '../../components/PostCard';
 import UsersInterface from '../../models/users';
 import LoadingBg from '../../components/Loading';
-import description from 'material-ui/svg-icons/action/description';
 
 const Posts: React.FC = () => {
   const [posts, setPosts] = useState<IPosts[]>([]);
@@ -57,16 +56,15 @@ const Posts: React.FC = () => {
 
     // requisição de tipo post sendo realizada para inserir uma tarefa a lista.
     try {
+      const finalResult = [...posts, result];
+      setPosts(finalResult);
+      setPost('');
+      setDescription('');
       const addNewPost = await addPost(result);
       console.log('addNewPost', addNewPost);
     } catch (err) {
       console.log(err);
     }
-
-    const finalResult = [...posts, result];
-    setPosts(finalResult);
-    setPost('');
-    setDescription('');
   };
 
   const updateTask = async (e: React.FormEvent) => {
@@ -81,18 +79,17 @@ const Posts: React.FC = () => {
 
       // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
       try {
+        posts[verifyPost].title = post;
+        posts[verifyPost].body = description;
+
+        setPosts((posts) => [...posts]);
+        setPost('');
+        setDescription('');
         const updatePosts = id && (await updatePost(id, result));
         console.log('updatePosts', updatePosts);
       } catch (err) {
         console.log(err);
       }
-
-      posts[verifyPost].title = post;
-      posts[verifyPost].body = description;
-
-      setPosts((posts) => [...posts]);
-      setPost('');
-      setDescription('');
     }
     setEdit(false);
   };
@@ -121,12 +118,11 @@ const Posts: React.FC = () => {
     // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
     e.stopPropagation();
     try {
+      setPosts(posts?.filter(({ id }) => id !== postId));
       await deletePost(postId);
     } catch (err) {
       console.log(err);
     }
-
-    setPosts(posts?.filter(({ id }) => id !== postId));
   };
 
   const handleEdit = async (e: any, id: number) => {
@@ -142,9 +138,10 @@ const Posts: React.FC = () => {
       const getTodosContent = async () => {
         try {
           setSelectedUser(JSON.parse(user));
-          const todosData = await getPosts(selectedUser?.id);
-          setPosts(todosData);
-          setLoading(true);
+          const todosData = await getPosts(selectedUser?.id).then((todos) => {
+            setPosts(todos);
+            setLoading(true);
+          });
         } catch (err) {
           const errorMessage = getErrorMessage(err);
           toast.error(errorMessage);
@@ -164,22 +161,28 @@ const Posts: React.FC = () => {
           </Title> */}
           <div>
             <form onSubmit={edit === false ? handleSubmit : updateTask}>
-              <InputComponent
-                type="text"
-                placeholder="Title"
-                value={post}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e)}
-              />
-              <TextFilef
-                multiline
-                rows={4}
-                type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  handleChangeDescription(e)
-                }
-              />
+              <div>
+                <InputComponent
+                  type="text"
+                  placeholder="Title"
+                  value={post}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleChange(e)
+                  }
+                />
+              </div>
+              <div>
+                <TextFilef
+                  multiline
+                  rows={4}
+                  type="text"
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleChangeDescription(e)
+                  }
+                />
+              </div>
 
               <ButtonContainer>
                 <ButtonContent
@@ -187,7 +190,6 @@ const Posts: React.FC = () => {
                   size="large"
                   variant="outlined"
                   type="submit"
-                  className={edit ? 'btn-success' : 'btn-info'}
                 >
                   {edit ? 'Edit post' : 'Add new post'}
                 </ButtonContent>

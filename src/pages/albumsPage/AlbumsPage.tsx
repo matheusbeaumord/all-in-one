@@ -8,8 +8,12 @@ import {
   ButtonContainer,
   TodosContainer,
 } from './style';
-import { getAlbums, addAlbums, updateAlbums, deleteAlbums  } from '../../services/albums';
-
+import {
+  getAlbums,
+  addAlbums,
+  updateAlbums,
+  deleteAlbums,
+} from '../../services/albums';
 
 import getErrorMessage from '../../helpers/errorMessages';
 import AlbumCard from '../../components/AlbumsCard';
@@ -48,15 +52,14 @@ const Albums: React.FC = () => {
 
     // requisição de tipo album sendo realizada para inserir uma tarefa a lista.
     try {
+      const finalResult = [...albums, result];
+      setAlbums(finalResult);
+      setAlbum('');
       const addNewAlbum = await addAlbums(result);
       console.log('addNewAlbum', addNewAlbum);
     } catch (err) {
       console.log(err);
     }
-
-    const finalResult = [...albums, result];
-    setAlbums(finalResult);
-    setAlbum('');
   };
 
   const updateTask = async (e: React.FormEvent) => {
@@ -70,15 +73,14 @@ const Albums: React.FC = () => {
 
       // requisição de tipo put sendo realizada para alterar uma tarefa da lista.
       try {
+        albums[verifyAlbum].title = album;
+        setAlbums((albums) => [...albums]);
+        setAlbum('');
         const updateAlbum = id && (await updateAlbums(id, result));
         console.log('updateAlbum', updateAlbum);
       } catch (err) {
         console.log(err);
       }
-
-      albums[verifyAlbum].title = album;
-      setAlbums((albums) => [...albums]);
-      setAlbum('');
     }
     setEdit(false);
   };
@@ -98,12 +100,11 @@ const Albums: React.FC = () => {
     // requisição de tipo delete sendo realizada para remover uma tarefa da lista.
     e.stopPropagation();
     try {
+      setAlbums(albums?.filter(({ id }) => id !== postId));
       await deleteAlbums(postId);
     } catch (err) {
       console.log(err);
     }
-
-    setAlbums(albums?.filter(({ id }) => id !== postId));
   };
 
   const handleEdit = async (e: any, id: number) => {
@@ -118,9 +119,10 @@ const Albums: React.FC = () => {
       const getTodosContent = async () => {
         try {
           setSelectedUser(JSON.parse(user));
-          const todosData = await getAlbums(selectedUser?.id);
-          setAlbums(todosData);
-          setLoading(true);
+          await getAlbums(selectedUser?.id).then((album) => {
+            setAlbums(album);
+            setLoading(true);
+          });
         } catch (err) {
           const errorMessage = getErrorMessage(err);
           toast.error(errorMessage);
