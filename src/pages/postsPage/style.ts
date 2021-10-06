@@ -35,7 +35,7 @@ export const InputComponent = styled(Input)`
 
 export const TextFilef = styled(TextField)`
 width: 40rem;
-height: 10rem;
+height: 7.5rem;
 `;
 
 export const ButtonContainer = styled.div`
@@ -43,7 +43,7 @@ export const ButtonContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 0 2rem 0;
+  /* padding: 2rem 0 2rem 0; */
 `;
 
 export const ButtonContent = styled(Button)`
